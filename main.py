@@ -1,7 +1,7 @@
 import os
 import sys
 from PySide6.QtWidgets import QApplication
-from app.window import MainWindow
+from ui.window import MainWindow
 
 
 def _ensure_venv_and_reexec():
