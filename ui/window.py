@@ -14,16 +14,30 @@ class MainWindow(QMainWindow):
         loader = QUiLoader()
         ui_file = QFile("ui/ventana.ui")
         ui_file.open(QFile.ReadOnly)
+
+        print("[DEBUG] Cargando ui/ventana.ui ...")
         ui = loader.load(ui_file, self)
         ui_file.close()
+        if ui is None:
+            print("[ERROR] No se pudo cargar ui/ventana.ui")
+        else:
+            print("[DEBUG] UI cargada correctamente")
 
-        # Asignar centralWidget
-        central_widget = ui.findChild(QWidget, "centralwidget")
-        # Buscar botón antes de asignar centralWidget
-        start_button = central_widget.findChild(QWidget, "startButton")
-        if start_button:
-            start_button.clicked.connect(self.show_second_window)
-        self.setCentralWidget(central_widget)
+        # Asignar centralWidget y exponerlo
+        self.central_widget = ui.findChild(QWidget, "centralwidget") if ui else None
+        if self.central_widget is None:
+            print("[ERROR] No se encontró 'centralwidget' en la UI")
+            self.setCentralWidget(ui)
+        else:
+            print("[DEBUG] 'centralwidget' encontrado y asignado")
+            self.setCentralWidget(self.central_widget)
+
+        # Mostrar el puerto en label1
+        from config import SERIAL_PORT
+        label1 = self.findChild(QLabel, "label1")
+        if label1:
+            label1.setText(f"Puerto: {SERIAL_PORT}")
+            label1.setStyleSheet("font-size: 24px; color: #fff;")
 
         # Tema oscuro
         dark_stylesheet = (
@@ -56,7 +70,9 @@ class MainWindow(QMainWindow):
 
         edit_menu.addAction(QAction("Undo", self))
 
-        about_menu.addAction(QAction("About", self))
+        about_action = QAction("About", self)
+        about_action.triggered.connect(self.show_about_page)
+        about_menu.addAction(about_action)
 
         menubar.addMenu(file_menu)
         menubar.addMenu(edit_menu)
@@ -65,6 +81,24 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle("Hola App")
         self.showFullScreen()
+
+    def show_about_page(self):
+        from PySide6.QtUiTools import QUiLoader
+        from PySide6.QtCore import QFile
+        from PySide6.QtWidgets import QMainWindow
+        loader = QUiLoader()
+        ui_file = QFile("ui/about.ui")
+        ui_file.open(QFile.ReadOnly)
+        about_widget = loader.load(ui_file)
+        ui_file.close()
+        about_window = QMainWindow()
+        central = about_widget.findChild(QWidget, "centralwidget")
+        if central:
+            about_window.setCentralWidget(central)
+        else:
+            about_window.setCentralWidget(about_widget)
+        about_window.setWindowTitle("About")
+        about_window.show()
 
 
     def show_second_window(self):

@@ -1,7 +1,10 @@
 import os
 import sys
-from PySide6.QtWidgets import QApplication
+
+from PySide6.QtWidgets import QApplication, QWidget
 from ui.window import MainWindow
+from controller import AppController
+from config import APP_TITLE
 
 
 def _ensure_venv_and_reexec():
@@ -48,7 +51,8 @@ _ensure_venv_and_reexec()
 def main():
     app = QApplication(sys.argv)
     window = MainWindow()
-    # controller = AppController(window)  # hook for future logic
+    window.setWindowTitle(APP_TITLE)
+    controller = AppController(window)
     sys.exit(app.exec())
 
 
