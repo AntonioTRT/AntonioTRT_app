@@ -19,8 +19,12 @@ def _ensure_venv_and_reexec():
 
     # Locate a local venv directory next to this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    venv_dir = os.path.join(script_dir, "venv")
-    if not os.path.isdir(venv_dir):
+    venv_dirs = [
+        os.path.join(script_dir, "venv"),
+        os.path.join(script_dir, ".venv"),
+    ]
+    venv_dir = next((d for d in venv_dirs if os.path.isdir(d)), None)
+    if not venv_dir:
         return
 
     # Choose the interpreter inside the venv
