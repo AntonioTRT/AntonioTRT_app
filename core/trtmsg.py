@@ -1,4 +1,5 @@
 import serial
+import serial.tools.list_ports
 import yaml
 import os
 import sys
@@ -80,6 +81,30 @@ Comandos de hardware:
         except Exception as e:
             return False, f"Error inesperado: {e}"
 
+    @staticmethod
+    def list_devices(show_all=False):
+        """Lista los puertos COM disponibles en el sistema."""
+        ports = []
+        
+        # Usar pyserial para detectar puertos
+        available_ports = serial.tools.list_ports.comports()
+        
+        if not available_ports:
+            return "No se encontraron puertos COM disponibles."
+        
+        output = "\nPuertos COM disponibles:\n"
+        output += "-" * 60 + "\n"
+        
+        for port in available_ports:
+            port_info = f"Puerto: {port.device}"
+            if show_all:
+                port_info += f"\n  Descripcion: {port.description}"
+                port_info += f"\n  Hardware: {port.hwid}"
+            output += port_info + "\n"
+        
+        output += "-" * 60
+        return output
+
 # Logica para ejecucion directa desde terminal (CLI)
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -100,6 +125,7 @@ if __name__ == "__main__":
         help_text = """
 Comandos del sistema TRT:
   version              - Muestra version de trtmsg
+  devices -a           - Lista puertos COM disponibles
   help                 - Muestra esta ayuda
 
 Comandos de hardware:
@@ -107,6 +133,11 @@ Comandos de hardware:
   ejemplo: python3 trtmsg.py send LED_ON 1
 """
         print(help_text.strip())
+        sys.exit(0)
+    elif comando_arg == "devices":
+        show_all = "-a" in sys.argv or "--all" in sys.argv
+        resultado = TRTMessage.list_devices(show_all=show_all)
+        print(resultado)
         sys.exit(0)
     
     # Resto de comandos requieren hardware (inicializar messenger)
