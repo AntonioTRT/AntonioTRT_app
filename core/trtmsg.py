@@ -8,10 +8,10 @@ import time
 __version__ = "1.0.0"
 
 class TRTMessage:
-    def __init__(self):
+    def __init__(self, port=None, baudrate=None):
         self.config = self._load_config()
-        self.port = self.config.get('serial_port', '/dev/ttyUSB0')
-        self.baudrate = self.config.get('baudrate', 9600)
+        self.port = port if port else self.config.get('serial_port', '/dev/ttyUSB0')
+        self.baudrate = baudrate if baudrate else self.config.get('baudrate', 9600)
 
     def _load_config(self):
         """Busca y carga el archivo local_config.yaml."""
@@ -105,14 +105,56 @@ Comandos de hardware:
         output += "-" * 60
         return output
 
+    def lcd_set_message(self, mensaje):
+        """Envía un mensaje a la pantalla LCD."""
+        # Limitar a 32 caracteres (2 líneas de 16 caracteres)
+        if len(mensaje) > 32:
+            mensaje = mensaje[:32]
+        
+        # Formato: LCD:SET:mensaje
+        trama = f"LCD:SET:{mensaje}\n"
+        
+        try:
+            ser = serial.Serial()
+            ser.port = self.port
+            ser.baudrate = self.baudrate
+            ser.timeout = 1
+            ser.dtr = False
+            ser.rts = False
+            
+            ser.open()
+            time.sleep(0.1)
+            
+            ser.write(trama.encode('utf-8'))
+            
+            # Leer respuesta
+            respuesta = ser.readline().decode('utf-8').strip()
+            ser.close()
+            
+            return True, respuesta if respuesta else "Mensaje enviado al LCD"
+        
+        except serial.SerialException as e:
+            return False, f"Error de conexion: {e}"
+        except Exception as e:
+            return False, f"Error: {e}"
+
 # Logica para ejecucion directa desde terminal (CLI)
 if __name__ == "__main__":
+    def extract_port(args):
+        if '-u' in args:
+            idx = args.index('-u')
+            if idx + 1 < len(args):
+                port = args[idx + 1]
+                del args[idx:idx + 2]
+                return port
+        return None
+
     if len(sys.argv) < 2:
         print("Uso: python3 trtmsg.py <comando> [valor]")
         print("Ejemplos:")
         print("  python3 trtmsg.py version")
         print("  python3 trtmsg.py help")
-        print("  python3 trtmsg.py send LED_ON 1")
+        print("  python3 trtmsg.py send LED_ON 1 -u COM3")
         sys.exit(1)
 
     comando_arg = sys.argv[1]
@@ -125,12 +167,18 @@ if __name__ == "__main__":
         help_text = """
 Comandos del sistema TRT:
   version              - Muestra version de trtmsg
-  devices -a           - Lista puertos COM disponibles
+  devices [-a]         - Lista puertos COM disponibles
   help                 - Muestra esta ayuda
 
 Comandos de hardware:
-  send <modulo> <valor>  - Envía comando al microcontrolador
-  ejemplo: python3 trtmsg.py send LED_ON 1
+  send <modulo> <valor> [-u <puerto>]      - Envía comando al microcontrolador
+  lcd12s set "mensaje" [-u <puerto>]      - Envía mensaje a pantalla LCD
+
+Ejemplos:
+  trtmsg version
+  trtmsg devices -a
+  trtmsg send LED_ON 1 -u COM3
+  trtmsg lcd12s set "Hola Mundo" -u /dev/ttyUSB0
 """
         print(help_text.strip())
         sys.exit(0)
@@ -139,12 +187,30 @@ Comandos de hardware:
         resultado = TRTMessage.list_devices(show_all=show_all)
         print(resultado)
         sys.exit(0)
+    elif comando_arg == "lcd12s":
+        port = extract_port(sys.argv)
+        if len(sys.argv) < 4:
+            print("Uso: trtmsg lcd12s set \"mensaje\" -u <puerto>")
+            sys.exit(1)
+        
+        subcomando = sys.argv[2]
+        
+        if subcomando == "set":
+            mensaje = " ".join(sys.argv[3:])
+            messenger = TRTMessage(port=port)
+            exito, resultado = messenger.lcd_set_message(mensaje)
+            print(resultado)
+            sys.exit(0 if exito else 1)
+        else:
+            print("Subcomando desconocido. Usa: trtmsg lcd12s set \"mensaje\" -u <puerto>")
+            sys.exit(1)
     
     # Resto de comandos requieren hardware (inicializar messenger)
-    messenger = TRTMessage()
+    port = extract_port(sys.argv)
+    messenger = TRTMessage(port=port)
     
     if len(sys.argv) < 3:
-        print("Uso para comando de hardware: python3 trtmsg.py <modulo> <valor>")
+        print("Uso para comando de hardware: python3 trtmsg.py <modulo> <valor> -u <puerto>")
         sys.exit(1)
     
     modulo_arg = sys.argv[1]
