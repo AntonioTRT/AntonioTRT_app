@@ -1,0 +1,16 @@
+#!/bin/bash
+# Script wrapper para ejecutar trtmsg desde el root
+# Uso: ./trtmsg version
+#      ./trtmsg help
+#      ./trtmsg send LED_ON 1
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+if [ ! -f ".venv/bin/python" ]; then
+    echo "Error: Virtual environment no encontrado."
+    echo "Por favor ejecuta: python3 -m venv .venv"
+    exit 1
+fi
+
+.venv/bin/python core/trtmsg.py "$@"
