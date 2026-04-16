@@ -1,0 +1,32 @@
+# Configuración Default para TRT-AntonioTRT_app
+# Copia este archivo a local_config.yaml y personaliza según tu Raspberry Pi
+
+# Nombre identifiant de la Raspberry Pi
+pi_name: "RaspberryPi-B"
+
+# Tipo de placa conectada: 'uno' (Arduino Uno) o 'esp32' (ESP32)
+board_type: "uno"
+
+# Puerto serial según sistema operativo
+# Linux/Raspberry Pi: /dev/ttyUSB0, /dev/ttyACM0
+# Windows: COM3, COM4, etc.
+serial_port: "/dev/ttyUSB0"
+
+# Velocidad de comunicación en bauds
+baudrate: 9600
+
+# Características del hardware
+features:
+  has_lcd: false        # ¿Tiene display LCD 16x2?
+  has_fan: false        # ¿Tiene ventilador de refrigeración?
+
+# Puertos en uso (útil para documentación)
+pins_config:
+  temperature_sensor: 0   # Pin analógico del sensor de temperatura
+  relay_pin: 13           # Pin digital del relé
+  pwm_fan_pin: 11         # Pin PWM del ventilador (si tiene)
+
+# Logging
+logging:
+  level: "INFO"           # DEBUG, INFO, WARNING, ERROR
+  file: "/tmp/trt_app.log"

@@ -2,9 +2,45 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.so
+*.egg-info/
+dist/
+build/
 
 # Virtual environment
 .venv/
+venv/
+env/
 
-# VS Code
+# IDE
 .vscode/
+.idea/
+*.swp
+*.swo
+
+# Configuración LOCAL (específica de cada Raspberry Pi)
+config/local_config.yaml
+*.local.*
+
+# Logs
+*.log
+/tmp/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Compilados (Firmware)
+firmware/*/build/
+firmware/*/_build/
+*.hex
+*.bin
+*.elf
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+*.bak
+
+# Temporales
+*~
+.~*
