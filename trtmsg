@@ -1,0 +1,6 @@
+#!/bin/bash
+# Wrapper para trtmsg en bash (Linux/RPi)
+# Ejecuta el script real en scripts/
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+"$SCRIPT_DIR/scripts/trtmsg" "$@"
