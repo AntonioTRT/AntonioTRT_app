@@ -4,7 +4,7 @@ REM Uso: trtmsg version
 REM       trtmsg help
 REM       trtmsg send LED_ON 1
 
-cd /d "%~dp0"
+cd /d "%~dp0.."
 
 if not exist ".venv\Scripts\python.exe" (
     echo Error: Virtual environment no encontrado.

@@ -5,7 +5,7 @@
       "label": "Run App (Qt)",
       "type": "shell",
       "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-      "args": ["-B", "${workspaceFolder}\\main.py"],
+      "args": ["-B", "${workspaceFolder}\\trtappUI\\simple_app\\main.py"],
       "problemMatcher": [],
       "group": {
         "kind": "build",
@@ -34,7 +34,7 @@
       "label": "Install deps",
       "type": "shell",
       "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-      "args": ["-m", "pip", "install", "-r", "requirements.txt"],
+      "args": ["-m", "pip", "install", "-r", "trtappUI/simple_app/requirements.txt"],
       "presentation": {
         "echo": true,
         "reveal": "always"

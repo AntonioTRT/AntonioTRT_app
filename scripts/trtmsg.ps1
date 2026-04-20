@@ -7,7 +7,7 @@
 $ErrorActionPreference = "Stop"
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
-Set-Location $scriptDir
+Set-Location (Split-Path -Parent $scriptDir)
 
 if (-Not (Test-Path ".venv\Scripts\python.exe")) {
     Write-Host "Error: Virtual environment no encontrado."
