@@ -41,6 +41,9 @@ export PATH="$PATH:$(pwd)/scripts"
 # Asegurarse de que el script trtmsg sea ejecutable
 chmod +x scripts/trtmsg
 
+# Asegurarse de que el wrapper trtmsg.sh en la raíz sea ejecutable
+chmod +x trtmsg.sh
+
 # 5. Instalar dependencias
 echo "Instalando dependencias desde requirements.txt..."
 pip install --upgrade pip
@@ -70,7 +73,7 @@ fi
 
 # 8. Verificar que trtmsg funciona
 echo "Verificando trtmsg..."
-if trtmsg version > /dev/null 2>&1; then # Ahora 'trtmsg' debería estar en el PATH
+if ./trtmsg.sh version > /dev/null 2>&1; then # Ahora 'trtmsg.sh' debería ser ejecutable
     echo "✓ El comando trtmsg funciona correctamente."
 else
     echo "✗ Error: El comando trtmsg no funciona."
@@ -88,3 +91,13 @@ echo "Comandos disponibles:"
 echo "  trtmsg help"
 echo "  trtmsg devices"
 echo "  python3 trtappUI/py/main.py  # Para la interfaz Qt"
+
+echo ""
+echo "---"
+echo "💡 Consejo de uso:"
+echo "Para usar 'trtmsg' sin escribir './trtmsg', puedes añadir un alias a tu shell."
+echo "Ejecuta esto una sola vez:"
+echo ""
+echo "echo \"alias trtmsg='$(pwd)/trtmsg'\" >> ~/.bashrc && source ~/.bashrc"
+echo ""
+echo "Después de eso, podrás usar 'trtmsg' desde cualquier lugar en futuras sesiones."
