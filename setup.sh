@@ -38,6 +38,9 @@ echo "Entorno virtual activado."
 # Esto es crucial para que el comando 'trtmsg' sea encontrado durante la verificación.
 export PATH="$PATH:$(pwd)/scripts"
 
+# Asegurarse de que el script trtmsg sea ejecutable
+chmod +x scripts/trtmsg
+
 # 5. Instalar dependencias
 echo "Instalando dependencias desde requirements.txt..."
 pip install --upgrade pip

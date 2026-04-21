@@ -1,16 +1,22 @@
 #!/bin/bash
-# Script wrapper para ejecutar trtmsg desde el root
-# Uso: ./trtmsg version
-#      ./trtmsg help
-#      ./trtmsg send LED_ON 1
+#
+# Script principal para ejecutar comandos de trtmsg.
+# Se encarga de activar el entorno virtual y llamar al script de Python.
+#
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR/.."
+# Navegar a la raíz del proyecto desde la ubicación de este script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$PROJECT_ROOT"
 
-if [ ! -f ".venv/bin/python" ]; then
-    echo "Error: Virtual environment no encontrado."
-    echo "Por favor ejecuta: python3 -m venv .venv"
+# Activar el entorno virtual. Si no existe, el setup debería haberlo creado.
+if [ -f ".venv/bin/activate" ]; then
+    source .venv/bin/activate
+else
+    echo "Error: Entorno virtual no encontrado en $(pwd)/.venv" >&2
+    echo "Por favor, ejecuta el script setup.sh primero." >&2
     exit 1
 fi
 
-.venv/bin/python core/trtmsg.py "$@"
+# Ejecutar el script de Python, pasando todos los argumentos
+python core/trtmsg.py "$@"
