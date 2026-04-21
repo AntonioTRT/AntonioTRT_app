@@ -36,8 +36,8 @@ jobs:
 
     - name: Build firmware for Arduino Uno
       run: |
-        cd firmware/arduino-uno
-        arduino-cli compile --fqbn arduino:avr:uno . \
+        cd firmware/arduino
+        arduino-cli compile --fqbn arduino:avr:uno master_control.ino \
           --output-dir ./build \
           --verbose
       continue-on-error: true
@@ -54,9 +54,10 @@ jobs:
         pip install -r requirements.txt
         pip install pytest pytest-cov pyyaml
 
-    - name: Install app dependencies
+    - name: Install app dependencies (skip GUI in CI)
       run: |
-        pip install -r trtappUI/py/requirements.txt
+        # Instalar solo dependencias no-GUI para CI (sin PySide6 que requiere display)
+        pip install pyserial pyyaml
 
     - name: Run unit tests
       run: |
@@ -64,7 +65,7 @@ jobs:
 
     - name: Run tests with coverage
       run: |
-        pytest tests/ --cov=core --cov=trtappUI/py/controller \
+        pytest tests/ --cov=core \
           --cov-report=xml --cov-report=term-missing
 
     - name: Upload coverage to Codecov
