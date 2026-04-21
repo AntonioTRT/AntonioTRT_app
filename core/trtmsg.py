@@ -138,6 +138,19 @@ Comandos de hardware:
         except Exception as e:
             return False, f"Error: {e}"
 
+
+class TRTMessageHandler(TRTMessage):
+    """Alias compatible con la API de pruebas y la UI."""
+    pass
+
+_trt_handler_instance = None
+
+def get_trt_handler():
+    global _trt_handler_instance
+    if _trt_handler_instance is None:
+        _trt_handler_instance = TRTMessageHandler()
+    return _trt_handler_instance
+
 # Logica para ejecucion directa desde terminal (CLI)
 if __name__ == "__main__":
     def extract_port(args):
