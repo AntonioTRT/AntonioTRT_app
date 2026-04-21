@@ -41,8 +41,8 @@ export PATH="$PATH:$(pwd)/scripts"
 # Asegurarse de que el script trtmsg sea ejecutable
 chmod +x scripts/trtmsg
 
-# Asegurarse de que el wrapper trtmsg.sh en la raíz sea ejecutable
-chmod +x trtmsg.sh
+# Asegurarse de que el wrapper trtmsg (sin extensión) en la raíz sea ejecutable
+chmod +x trtmsg
 
 # 5. Instalar dependencias
 echo "Instalando dependencias desde requirements.txt..."
@@ -73,7 +73,7 @@ fi
 
 # 8. Verificar que trtmsg funciona
 echo "Verificando trtmsg..."
-if ./trtmsg.sh version > /dev/null 2>&1; then # Ahora 'trtmsg.sh' debería ser ejecutable
+if ./trtmsg version > /dev/null 2>&1; then # Ahora 'trtmsg' (sin extensión) debería ser ejecutable
     echo "✓ El comando trtmsg funciona correctamente."
 else
     echo "✗ Error: El comando trtmsg no funciona."
