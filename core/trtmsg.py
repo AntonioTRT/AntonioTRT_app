@@ -111,8 +111,8 @@ Comandos de hardware:
         if len(mensaje) > 32:
             mensaje = mensaje[:32]
         
-        # Formato: LCD:SET:mensaje
-        trama = f"LCD:SET:{mensaje}\n"
+        # Formato corregido para coincidir con Arduino: lcd:mensaje
+        trama = f"lcd:{mensaje}\n"
         
         try:
             ser = serial.Serial()
@@ -172,13 +172,21 @@ Comandos del sistema TRT:
 
 Comandos de hardware:
   send <modulo> <valor> [-u <puerto>]      - Envía comando al microcontrolador
-  lcd12s set "mensaje" [-u <puerto>]      - Envía mensaje a pantalla LCD
+  lcd set "mensaje" [-u <puerto>]         - Envía mensaje a pantalla LCD
+  analogread <pin> [-u <puerto>]          - Lee valor analógico del pin (1-5)
+  digitalwrite <pin> <estado> [-u <puerto>] - Controla pin digital (2-13, 0/1)
+  readlcd [-u <puerto>]                   - Lee mensaje actual de la LCD
+  reboot [-u <puerto>]                    - Reinicia el Arduino
 
 Ejemplos:
   trtmsg version
   trtmsg devices -a
   trtmsg send LED_ON 1 -u COM3
-  trtmsg lcd12s set "Hola Mundo" -u /dev/ttyUSB0
+  trtmsg lcd set "Hola Mundo" -u /dev/ttyUSB0
+  trtmsg analogread 3 -u COM3
+  trtmsg digitalwrite 5 1 -u COM3
+  trtmsg readlcd -u COM3
+  trtmsg reboot -u COM3
 """
         print(help_text.strip())
         sys.exit(0)
@@ -187,10 +195,10 @@ Ejemplos:
         resultado = TRTMessage.list_devices(show_all=show_all)
         print(resultado)
         sys.exit(0)
-    elif comando_arg == "lcd12s":
+    elif comando_arg == "lcd":
         port = extract_port(sys.argv)
         if len(sys.argv) < 4:
-            print("Uso: trtmsg lcd12s set \"mensaje\" -u <puerto>")
+            print("Uso: trtmsg lcd set \"mensaje\" -u <puerto>")
             sys.exit(1)
         
         subcomando = sys.argv[2]
@@ -202,8 +210,44 @@ Ejemplos:
             print(resultado)
             sys.exit(0 if exito else 1)
         else:
-            print("Subcomando desconocido. Usa: trtmsg lcd12s set \"mensaje\" -u <puerto>")
+            print("Subcomando desconocido. Usa: trtmsg lcd set \"mensaje\" -u <puerto>")
             sys.exit(1)
+    elif comando_arg == "analogread":
+        port = extract_port(sys.argv)
+        if len(sys.argv) < 3:
+            print("Uso: trtmsg analogread <pin> -u <puerto>")
+            sys.exit(1)
+        
+        pin = sys.argv[2]
+        messenger = TRTMessage(port=port)
+        exito, resultado = messenger.send("analogread", pin)
+        print(resultado)
+        sys.exit(0 if exito else 1)
+    elif comando_arg == "digitalwrite":
+        port = extract_port(sys.argv)
+        if len(sys.argv) < 4:
+            print("Uso: trtmsg digitalwrite <pin> <estado> -u <puerto>")
+            sys.exit(1)
+        
+        pin = sys.argv[2]
+        estado = sys.argv[3]
+        valor = f"{pin}:{estado}"
+        messenger = TRTMessage(port=port)
+        exito, resultado = messenger.send("digitalwrite", valor)
+        print(resultado)
+        sys.exit(0 if exito else 1)
+    elif comando_arg == "readlcd":
+        port = extract_port(sys.argv)
+        messenger = TRTMessage(port=port)
+        exito, resultado = messenger.send("readlcd", "")
+        print(resultado)
+        sys.exit(0 if exito else 1)
+    elif comando_arg == "reboot":
+        port = extract_port(sys.argv)
+        messenger = TRTMessage(port=port)
+        exito, resultado = messenger.send("reboot", "")
+        print(resultado)
+        sys.exit(0 if exito else 1)
     
     # Resto de comandos requieren hardware (inicializar messenger)
     port = extract_port(sys.argv)
