@@ -16,6 +16,27 @@ core/: El motor que envia los mensajes (trtmsg).
 firmware/: El codigo que se carga en el Arduino o ESP32.
 config/: Los ajustes de cada Raspberry (nombre, puerto, etc.).
 scripts/: Herramientas para instalar y actualizar todo con un clic.
+docs/: Documentación adicional.
+
+## Instalación en Raspberry Pi
+
+1. Clona el repositorio:
+   ```bash
+   git clone https://github.com/AntonioTRT/AntonioTRT_app
+   cd AntonioTRT_app
+   ```
+
+2. Ejecuta el script de configuración (activa venv e instala dependencias):
+   ```bash
+   ./setup.sh
+   ```
+
+3. El script verificará todo y dejará el entorno listo. Para futuras sesiones:
+   ```bash
+   cd AntonioTRT_app
+   source .venv/bin/activate
+   export PATH="$PATH:$(pwd)/scripts"
+   ```
 
 Como funciona trtmsg?
 
