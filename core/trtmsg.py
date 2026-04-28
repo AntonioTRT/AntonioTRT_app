@@ -4,6 +4,7 @@ import yaml
 import os
 import sys
 import time
+import subprocess
 
 __version__ = "1.0.0"
 
@@ -200,6 +201,8 @@ Ejemplos:
   trtmsg digitalwrite 5 1 -u COM3
   trtmsg readlcd -u COM3
   trtmsg reboot -u COM3
+  trtmsg cputemp
+  trtmsg sysinfo
 """
         print(help_text.strip())
         sys.exit(0)
@@ -260,6 +263,45 @@ Ejemplos:
         messenger = TRTMessage(port=port)
         exito, resultado = messenger.send("reboot", "")
         print(resultado)
+        sys.exit(0 if exito else 1)
+    elif comando_arg == "cputemp":
+        try:
+            # Comando para obtener la temperatura de la CPU en Raspberry Pi
+            temp_str = subprocess.check_output(['vcgencmd', 'measure_temp']).decode('utf-8')
+            # Salida es "temp=XX.X'C", extraemos el valor
+            resultado = temp_str.split('=')[1].strip()
+            print(f"Temperatura CPU: {resultado}")
+            sys.exit(0)
+        except FileNotFoundError:
+            print("Error: El comando 'vcgencmd' no fue encontrado. ¿Estás en una Raspberry Pi?")
+            sys.exit(1)
+        except Exception as e:
+            print(f"Error al leer la temperatura: {e}")
+            sys.exit(1)
+    elif comando_arg == "sysinfo":
+        try:
+            ip = subprocess.check_output(['hostname', '-I']).decode('utf-8').strip()
+            mem = subprocess.check_output(['free', '-m']).decode('utf-8').split('\n')[1].split()
+            disk = subprocess.check_output(['df', '-h', '/']).decode('utf-8').split('\n')[1].split()
+
+            info = (
+                f"--- Información del Sistema ---\n"
+                f"Dirección IP: {ip}\n"
+                f"Memoria RAM:  {mem[2]}MB Usados / {mem[1]}MB Total\n"
+                f"Disco (Raíz): {disk[2]} Usados / {disk[1]} Total ({disk[4]} Uso)"
+            )
+            print(info)
+            sys.exit(0)
+        except Exception as e:
+            print(f"Error al obtener la información del sistema: {e}")
+            sys.exit(1)
+    elif comando_arg == "rebootpi":
+        print("Iniciando reinicio de la Raspberry Pi...")
+        try:
+            # Usamos 'sudo' ya que reiniciar requiere privilegios de administrador
+            subprocess.run(['sudo', 'reboot'], check=True)
+        except Exception as e:
+            print(f"Error al reiniciar. Asegúrate de tener permisos de sudo: {e}")
         sys.exit(0 if exito else 1)
     
     # Resto de comandos requieren hardware (inicializar messenger)
